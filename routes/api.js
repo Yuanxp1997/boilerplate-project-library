@@ -41,6 +41,8 @@ module.exports = function (app, books) {
 
     .delete(function (req, res) {
       //if successful response will be 'complete delete successful'
+      books = [];
+      res.send("complete delete successful");
     });
 
   app
@@ -48,16 +50,36 @@ module.exports = function (app, books) {
     .get(function (req, res) {
       let bookid = req.params.id;
       //json res format: {"_id": bookid, "title": book_title, "comments": [comment,comment,...]}
+      const book = books.find((book) => book._id === bookid);
+      if (!book) {
+        return res.send("no book exists");
+      }
+      res.json(book);
     })
 
     .post(function (req, res) {
       let bookid = req.params.id;
       let comment = req.body.comment;
       //json res format same as .get
+      const book = books.find((book) => book._id === bookid);
+      if (!book) {
+        return res.send("no book exists");
+      }
+      if (!comment) {
+        return res.send("missing required field comment");
+      }
+      book.comments.push(comment);
+      res.json(book);
     })
 
     .delete(function (req, res) {
       let bookid = req.params.id;
       //if successful response will be 'delete successful'
+      const bookIndex = books.findIndex((book) => book._id === bookid);
+      if (bookIndex === -1) {
+        return res.send("no book exists");
+      }
+      books.splice(bookIndex, 1);
+      res.send("delete successful");
     });
 };
